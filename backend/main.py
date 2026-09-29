@@ -1,8 +1,10 @@
 import os
+import io
 
 import numpy as np
 import tensorflow as tf
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
 
@@ -31,6 +33,16 @@ app = FastAPI(
     title="Smart Waste Classification API",
     description="API for classifying waste images using a trained MobileNetV2 model.",
     version="1.0.0",
+)
+
+
+# Allow the React frontend to communicate with the backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -69,7 +81,7 @@ async def predict(file: UploadFile = File(...)):
     image_data = await file.read()
 
     image = Image.open(
-        __import__("io").BytesIO(image_data)
+        io.BytesIO(image_data)
     ).convert("RGB")
 
     image = image.resize(IMG_SIZE)
