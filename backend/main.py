@@ -8,31 +8,32 @@ from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 
 
-MODEL_PATH = "ml/model/waste_classifier_best.keras"
+# Build the model path relative to this file
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))
+)
+
+MODEL_PATH = os.path.join(
+    PROJECT_ROOT,
+    "ml",
+    "model",
+    "binary_waste_classifier.keras"
+)
 
 IMG_SIZE = (224, 224)
 
-CLASS_NAMES = [
-    "glass",
-    "metal",
-    "organic",
-    "paper",
-    "plastic",
-]
+CLASS_NAMES = ["Inorganic", "Organic"]
 
 BIN_RECOMMENDATIONS = {
-    "glass": "Glass / Recyclable Bin",
-    "metal": "Metal / Recyclable Bin",
-    "organic": "Organic / Compost Bin",
-    "paper": "Paper / Dry Waste Bin",
-    "plastic": "Plastic / Recyclable Bin",
+    "Inorganic": "Dry Waste Bin",
+    "Organic": "Organic / Compost Bin",
 }
 
 
 app = FastAPI(
     title="Smart Waste Classification API",
-    description="API for classifying waste images using a trained MobileNetV2 model.",
-    version="1.0.0",
+    description="API for classifying waste images as Organic or Inorganic using a custom CNN.",
+    version="2.0.0",
 )
 
 
@@ -60,6 +61,8 @@ def load_model():
         )
 
     model = tf.keras.models.load_model(MODEL_PATH)
+
+    print("Binary waste classification model loaded successfully!")
 
 
 @app.get("/")
@@ -101,15 +104,15 @@ async def predict(file: UploadFile = File(...)):
         verbose=0
     )
 
-    predicted_index = int(
-        np.argmax(predictions[0])
-    )
+    # The custom CNN returns one sigmoid probability for Organic
+    organic_probability = float(predictions[0][0])
 
-    predicted_class = CLASS_NAMES[predicted_index]
-
-    confidence = float(
-        predictions[0][predicted_index]
-    ) * 100
+    if organic_probability >= 0.5:
+        predicted_class = "Organic"
+        confidence = organic_probability * 100
+    else:
+        predicted_class = "Inorganic"
+        confidence = (1 - organic_probability) * 100
 
     return {
         "category": predicted_class,

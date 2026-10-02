@@ -2,43 +2,33 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 const wasteTypes = [
-  { name: "Plastic", icon: "♻", color: "plastic", detail: "Recyclable materials" },
-  { name: "Paper", icon: "▤", color: "paper", detail: "Paper & cardboard" },
-  { name: "Metal", icon: "▧", color: "metal", detail: "Metal packaging" },
-  { name: "Glass", icon: "◇", color: "glass", detail: "Glass containers" },
-  { name: "Organic", icon: "✿", color: "organic", detail: "Compostable waste" },
+  {
+    name: "Organic",
+    icon: "✿",
+    color: "organic",
+    detail: "Food scraps and compostable waste",
+  },
+  {
+    name: "Inorganic",
+    icon: "♻",
+    color: "inorganic",
+    detail: "Paper, plastic, glass and metal",
+  },
 ];
 
 const categoryDetails = {
-  plastic: {
-    title: "Plastic",
-    icon: "♻",
-    description: "This item was identified as plastic waste.",
-    tip: "Rinse containers when possible and place them in the appropriate recycling stream.",
-  },
-  paper: {
-    title: "Paper",
-    icon: "▤",
-    description: "This item was identified as paper waste.",
-    tip: "Keep paper dry and clean to help make recycling easier.",
-  },
-  metal: {
-    title: "Metal",
-    icon: "▧",
-    description: "This item was identified as metal waste.",
-    tip: "Empty metal containers before placing them in the recycling stream.",
-  },
-  glass: {
-    title: "Glass",
-    icon: "◇",
-    description: "This item was identified as glass waste.",
-    tip: "Handle broken glass carefully and follow your local disposal guidance.",
-  },
   organic: {
     title: "Organic",
     icon: "✿",
     description: "This item was identified as organic waste.",
     tip: "Food scraps and other suitable organic materials can be directed to composting.",
+  },
+  inorganic: {
+    title: "Inorganic",
+    icon: "♻",
+    description:
+      "This item was identified as inorganic waste, a category that includes paper, plastic, glass and metal in this project.",
+    tip: "Separate materials where possible and follow your local recycling and disposal guidelines.",
   },
 };
 
@@ -162,8 +152,8 @@ function App() {
 
             <p className="hero-description">
               Turn a simple photo into a smarter disposal decision. EcoSort
-              uses an image classification model to identify waste and suggest
-              the right bin category.
+              uses a custom-built image classification model to identify waste
+              as Organic or Inorganic and suggest a suitable bin category.
             </p>
 
             <a className="hero-cta" href="#classifier">
@@ -172,13 +162,17 @@ function App() {
 
             <div className="hero-note">
               <span className="note-icon">✦</span>
-              Image-based classification · 5 waste categories
+              Image-based classification · 2 waste categories
             </div>
           </div>
 
-          <div className="hero-visual" aria-label="Illustration of waste sorting">
+          <div
+            className="hero-visual"
+            aria-label="Illustration of waste sorting"
+          >
             <div className="visual-orbit orbit-one" />
             <div className="visual-orbit orbit-two" />
+
             <div className="visual-label label-top">
               <span className="label-pulse" />
               AI VISION SYSTEM
@@ -187,14 +181,18 @@ function App() {
             <div className="visual-center">
               <div className="leaf-art leaf-back">❧</div>
               <div className="visual-recycle">↻</div>
-              <div className="visual-caption">GIVE WASTE<br />A NEW PURPOSE</div>
+              <div className="visual-caption">
+                GIVE WASTE
+                <br />
+                A NEW PURPOSE
+              </div>
             </div>
 
             <div className="floating-tag tag-left">
               <span className="tag-icon">✿</span>
               <span>
                 <strong>Identify</strong>
-                <small>Waste material</small>
+                <small>Waste category</small>
               </span>
             </div>
 
@@ -225,15 +223,19 @@ function App() {
               <strong>Upload image</strong>
             </span>
           </div>
+
           <span className="process-arrow">→</span>
+
           <div className="process-step">
             <span className="process-icon">✳</span>
             <span>
               <small>STEP 02</small>
-              <strong>AI classifies</strong>
+              <strong>Custom CNN classifies</strong>
             </span>
           </div>
+
           <span className="process-arrow">→</span>
+
           <div className="process-step">
             <span className="process-icon">♻</span>
             <span>
@@ -250,16 +252,19 @@ function App() {
                 <span className="eyebrow-line" />
                 TRY THE CLASSIFIER
               </div>
+
               <h2>What goes where?</h2>
+
               <p>
                 Upload a picture of a waste item and let the model analyze it.
               </p>
             </div>
+
             <div className="model-badge">
               <span className="model-badge-icon">✳</span>
               <span>
-                <strong>MobileNetV2</strong>
-                <small>Image classification model</small>
+                <strong>Custom CNN</strong>
+                <small>Trained from scratch</small>
               </span>
             </div>
           </div>
@@ -313,13 +318,16 @@ function App() {
               <div className="file-info">
                 <span className="file-info-icon">▧</span>
                 <span className="file-info-text">
-                  <strong>{selectedFile ? selectedFile.name : "No image selected"}</strong>
+                  <strong>
+                    {selectedFile ? selectedFile.name : "No image selected"}
+                  </strong>
                   <small>
                     {selectedFile
                       ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB · Ready to analyze`
                       : "Your image will appear here"}
                   </small>
                 </span>
+
                 {selectedFile && (
                   <button
                     className="remove-file"
@@ -372,12 +380,13 @@ function App() {
 
               {result && resultDetails ? (
                 <div className="result-content">
-                  <div className={`result-symbol ${result.category}`}>
+                  <div className={`result-symbol ${result.category.toLowerCase()}`}>
                     {resultDetails.icon}
                   </div>
 
                   <div className="result-kicker">DETECTED CATEGORY</div>
                   <h3>{resultDetails.title}</h3>
+
                   <p className="result-description">
                     {resultDetails.description}
                   </p>
@@ -387,6 +396,7 @@ function App() {
                       <span>Model confidence</span>
                       <strong>{Number(result.confidence).toFixed(2)}%</strong>
                     </div>
+
                     <div
                       className="confidence-track"
                       role="progressbar"
@@ -434,11 +444,14 @@ function App() {
                     <span className="scan-spark spark-a">✦</span>
                     <span className="scan-spark spark-b">✧</span>
                   </div>
+
                   <h3>Your result will appear here</h3>
+
                   <p>
                     Once you upload an image and start the analysis, you’ll see
                     the predicted waste category, confidence, and suggested bin.
                   </p>
+
                   <div className="empty-steps">
                     <span>01 Select image</span>
                     <i />
@@ -455,29 +468,44 @@ function App() {
             <div>
               <div className="eyebrow">
                 <span className="eyebrow-line" />
-                FIVE MATERIAL CLASSES
+                TWO WASTE CLASSES
               </div>
+
               <h2>Know your waste.</h2>
+
               <p>
-                The model is trained to recognize these five waste categories.
+                The custom CNN classifies waste into Organic and Inorganic
+                categories.
               </p>
             </div>
-            <span className="category-count">05 <small>CATEGORIES</small></span>
+
+            <span className="category-count">
+              02 <small>CATEGORIES</small>
+            </span>
           </div>
 
           <div className="category-grid">
             {wasteTypes.map((type, index) => (
-              <article className={`category-card ${type.color}`} key={type.name}>
+              <article
+                className={`category-card ${type.color}`}
+                key={type.name}
+              >
                 <div className="category-card-top">
                   <span className="category-number">0{index + 1}</span>
                   <span className="category-icon">{type.icon}</span>
                 </div>
+
                 <h3>{type.name}</h3>
                 <p>{type.detail}</p>
                 <span className="category-card-arrow">↗</span>
               </article>
             ))}
           </div>
+
+          <p className="category-note">
+            In this project, Inorganic includes the glass, metal, paper, and
+            plastic images grouped together in the training dataset.
+          </p>
         </section>
 
         <section className="how-section" id="how-it-works">
@@ -486,7 +514,13 @@ function App() {
               <span className="eyebrow-line" />
               BEHIND THE SORT
             </div>
-            <h2>How EcoSort<br /><span>makes a decision.</span></h2>
+
+            <h2>
+              How EcoSort
+              <br />
+              <span>makes a decision.</span>
+            </h2>
+
             <p>
               A simple image goes through a machine-learning pipeline to produce
               a category prediction and a practical disposal suggestion.
@@ -502,6 +536,7 @@ function App() {
               </div>
               <span className="timeline-icon">▧</span>
             </div>
+
             <div className="timeline-item">
               <span className="timeline-number">02</span>
               <div>
@@ -510,14 +545,18 @@ function App() {
               </div>
               <span className="timeline-icon">⌗</span>
             </div>
+
             <div className="timeline-item">
               <span className="timeline-number">03</span>
               <div>
-                <h3>AI classification</h3>
-                <p>MobileNetV2 predicts one of the five waste classes.</p>
+                <h3>Custom CNN classification</h3>
+                <p>
+                  A CNN trained from scratch predicts Organic or Inorganic.
+                </p>
               </div>
               <span className="timeline-icon">✳</span>
             </div>
+
             <div className="timeline-item">
               <span className="timeline-number">04</span>
               <div>
@@ -535,19 +574,27 @@ function App() {
             <span>SMALL ACTIONS. BETTER HABITS.</span>
             <h2>Make the next toss a thoughtful one.</h2>
           </div>
-          <a href="#classifier">Try the classifier <span>↗</span></a>
+          <a href="#classifier">
+            Try the classifier <span>↗</span>
+          </a>
         </section>
       </main>
 
       <footer className="footer">
         <a className="brand footer-brand" href="#home">
-          <span className="brand-mark"><span>↻</span></span>
+          <span className="brand-mark">
+            <span>↻</span>
+          </span>
           <span className="brand-name">
             Eco<span>Sort</span>
             <small>SMART WASTE INTELLIGENCE</small>
           </span>
         </a>
-        <p>Image-based waste classification · Built for a smarter sorting habit.</p>
+
+        <p>
+          Image-based waste classification · Built for a smarter sorting habit.
+        </p>
+
         <span className="footer-credit">A STUDENT AI/ML PROJECT</span>
       </footer>
     </div>
